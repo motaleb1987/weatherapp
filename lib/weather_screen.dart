@@ -26,7 +26,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   // home work
 
-  double ? _hi, _lo;
+  double ? _highT, _lowT;
+  List<String> _dateForecust =[];
 
    List<_Hourly> _hourlies =[];
 
@@ -99,6 +100,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
         );
       }
 
+      final dDate = await ((deCodedData['daily']) as Map<String, dynamic> ? ) ??  {};
+      final dTime = List<String>.from(dDate['time'] as List);
+      final maxTemp= (dDate['temperature_2m_max']);
+      final minTemp= dDate['temperature_2m_min'];
+      //print(maxTemp);
+     // print(minTemp);
+
 
 
       setState(() {
@@ -108,7 +116,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
         _resolvedCity = getGeo!.city;
         _country = getGeo.country;
         _hourlies = outHourly;
+        _dateForecust = dTime;
+        _highT = maxTemp;
+        _lowT = minTemp;
       });
+
+
 
     }catch(e){
       _error = e.toString();
@@ -210,7 +223,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   children: [
                     Text(_country == null ? "My Location": " $_country", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18, color: Colors.white),),
                     Text(_resolvedCity.toString(), style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20, color: Colors.white),),
-                    Text("${_tempC!.toStringAsFixed(0).toString()}°C", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 100, color: Colors.white),),
+                    Text("${_tempC?.toStringAsFixed(0).toString()}°C", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 100, color: Colors.white),),
                     Text(_codeToText(_wCode), style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20, color: Colors.white),),
                   ],
                 ),
@@ -258,26 +271,32 @@ class _WeatherScreenState extends State<WeatherScreen> {
                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('7-Day Forecast', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                       SizedBox(
-                         width: double.infinity,
-                         child: Row(
-                           children: [
-                             Text('ToDay'),
-                             SizedBox(width: 10,),
-                             Icon(Icons.sunny_snowing,),
-                             SizedBox(width: 10,),
-                             Expanded(
-                               child: LinearProgressIndicator(
-                                 value: 0.6,
-                                 color: Colors.grey[300],
-                                 backgroundColor: Colors.orange,
-                               ),
-                             ),
-                             SizedBox(width: 10,),
-                             Text('17° - 27° '),
-                           ],
-                         ),
-                       )
+
+                        SizedBox(
+                          height: 250,
+                          child: ListView.builder(
+                            itemCount: _dateForecust.length,
+                              itemBuilder: (context, index) {
+                             // final t = _highT ?? _highT[index] : 0;
+                            return  Row(
+                              children: [
+                                Text(_dateForecust[index]),
+                                SizedBox(width: 10,),
+                                Icon(Icons.sunny_snowing,),
+                                SizedBox(width: 10,),
+                                Expanded(
+                                  child: LinearProgressIndicator(
+                                    value: 0.6,
+                                    color: Colors.grey[300],
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                ),
+                                SizedBox(width: 10,),
+                                Text('17° - 27° '),
+                              ],
+                            );
+                          }),
+                        ),
                       ],
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
 
@@ -101,7 +102,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
       }
 
       final dDate = await ((deCodedData['daily']) as Map<String, dynamic> ? ) ??  {};
+     // final dTime = List<String>.from(dDate['time'] as List);
       final dTime = List<String>.from(dDate['time'] as List);
+
+      for (int i = 0; i < dTime.length; i++) {
+        final date = DateTime.parse(dTime[i]);
+
+        final now = DateTime.now();
+        final isToday = date.year == now.year &&
+            date.month == now.month &&
+            date.day == now.day;
+
+        dTime[i] = isToday ? 'Today' : DateFormat('EEEE').format(date);
+      }
       final maxTemp= (dDate['temperature_2m_max']);
       final minTemp= dDate['temperature_2m_min'];
       //print(maxTemp);
@@ -277,6 +290,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           child: ListView.builder(
                             itemCount: _dateForecust.length,
                               itemBuilder: (context, index) {
+                             // final mtemp = minTemp[index];
                              // final t = _highT ?? _highT[index] : 0;
                             return  Row(
                               children: [
@@ -292,7 +306,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 10,),
-                                Text('17° - 27° '),
+                                Text('${minTemp[index]?? '0'}° - 27° '),
                               ],
                             );
                           }),
